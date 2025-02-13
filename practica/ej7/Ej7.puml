@@ -1,0 +1,155 @@
+' SISTEMAS DE BASES DE DATOS – INGENIERÍA INFORMÁTICA 
+ 
+' DISEÑO DE BASES DE DATOS RELACIONALES 
+ 
+ 
+' Ejercicio N° 7: Construir el modelo de datos lógico y el modelo físico para el siguiente 
+' problema: 
+ 
+' Una empresa de desarrollos informáticos está dividida en departamentos, en cada uno 
+' de los cuales trabaja un conjunto de profesionales. La empresa desarrolla diferentes 
+' proyectos, algunos propios y otros para clientes específicos. Cada desarrollo se divide 
+' en etapas. Cada etapa está a cargo de un departamento. Cada departamento asigna un 
+' grupo de profesionales para cada una de las tareas que corresponden a las etapas a su 
+' cargo. Se debe mantener información acerca de los departamentos, profesionales, 
+' proyectos, etapas, tareas y clientes. 
+ 
+' Los proyectos se identifican por un número de proyecto único y se requiere su nombre, 
+' cantidad de horas totales y presupuesto total del mismo y, en el caso que se desarrollen 
+' para un cliente determinado, información acerca de este (nro. cliente (único), nombre, 
+' dirección, teléfono) 
+' Los departamentos se identifican por un número y se requiere su nombre. 
+' Los profesionales se identifican por un número y se requiere su nombre, título, cargo y 
+' departamento en el cual trabajan. 
+' Las etapas se identifican por un número único por proyecto y se requiere como 
+' información su denominación, descripción, horas asignadas, presupuesto y 
+' departamento asignado a la misma. 
+' Las tareas se identifican por un número único y se requiere su nombre. 
+' Además se necesita conocer, para cada tarea correspondiente a una etapa de un 
+' proyecto, los profesionales ocupados en dicha tarea, la cantidad de horas y el 
+' presupuesto asignado a la misma. 
+ 
+' Consideraciones y aclaraciones: 
+ 
+' − La empresa tiene varios proyectos. 
+' − El desarrollo de un proyecto es llevado a cabo en varias etapas cada una de las 
+' cuales es asignada a un departamento. 
+' − Una etapa de un proyecto es realizada solo por un departamento. 
+' − Un departamento puede trabajar simultáneamente en varias etapas que pueden 
+' corresponder a uno o varios proyectos. 
+' − Una etapa consta de varias tareas. 
+' − La cantidad de horas y el presupuesto de cada etapa se obtiene sumando la 
+' cantidad de horas y presupuesto de todas las tareas correspondientes a la etapa. 
+' − Una tarea puede ser requerida en varias etapas  pertenecientes a uno o varios 
+' proyectos, pero en cada etapa de cada proyecto la tarea tendrá asignada una 
+' cantidad de horas y un presupuesto determinado. 
+' − Un profesional puede estar trabajando en cero o una tarea correspondiente a una 
+' etapa a cargo de su departamento. 
+' − Una tarea puede ser desarrollada por varios profesionales. 
+ 
+ 
+
+
+
+
+@startuml 
+class Departamento {
+    nro_departamento: int
+    --
+    nom_departamento: varchar
+}
+
+class Profesional {
+    nro_profesional: int
+    --
+    nom_profesional: varchar
+    titulo: int
+    cargo: int
+    nro_departamento: int
+}
+
+class Titulo {
+    nro_titulo: int
+    --
+    nom_titulo: varchar
+}
+
+class Cargo {
+    nro_cargo: int
+    --
+    nom_cargo: varchar
+    descripcion: varchar
+}
+
+class Proyecto {
+    nro_proyecto: int
+    --
+    nom_proyecto: varchar
+    cant_horas_totales: int
+    presupuesto: float
+    nro_cliente: int
+}
+
+class Cliente {
+    nro_cliente: int
+    --
+    nom_cliente: varchar
+    direccion: varchar
+    telefono: varchar
+}
+
+class Etapa {
+    nro_proyecto: int
+    nro_etapa: int
+    --
+    denominacion: varchar
+    descripcion: varchar
+    horas_asignadas: int
+    presupuesto: float
+    departamento_asignado: int
+}
+
+class Tarea {
+    nro_tarea: int
+    --
+    nom_tarea: varchar
+}
+
+class Tarea_Etapa {
+    nro_proyecto: int
+    nro_etapa: int
+    nro_tarea: int
+    --
+    cantidad_horas: int
+    presupuesto: float
+}
+
+class Profesional_Tarea_Etapa {
+    nro_profesional: int
+    nro_proyecto: int
+    nro_etapa: int
+    nro_tarea: int
+
+}
+
+
+Departamento "1"..{ Profesional
+Etapa }-- "1" Proyecto
+Proyecto }.."1" Cliente
+
+'redundante? 
+Departamento "1"..{ Etapa
+
+
+Profesional_Tarea_Etapa }-- "0" Profesional
+Profesional_Tarea_Etapa }-- "1" Tarea_Etapa
+
+
+Tarea_Etapa }-- "1" Tarea
+Tarea_Etapa }-- "1" Etapa
+
+Cargo "1"..{ Profesional
+Titulo "1"..{ Profesional
+ 
+@enduml
+

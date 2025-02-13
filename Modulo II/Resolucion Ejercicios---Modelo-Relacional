@@ -1,0 +1,29 @@
+Ejercicios---Modelo-Relacional
+Problema 2:
+1. 
+*Claves primarias:
+Alumno: nro_alumno
+Carreras: cod_carrera
+Materias: cod_carrera,cod_materia
+Matricula: nro_alumno,cod_carrera
+Examenes: nro_libro,nro_acta,nro_alumno
+*Claves Alternativas:
+Alumno: nro_doc_alumno
+Carrera: nom_carrera
+Materias: cod_carrera,nom_materia
+Matriculas: -
+Examenes: nro_alumno,cod_carrera,cod_materia,fecha_examen
+*Claves Foraneas
+Alumno: -
+Carreras: -
+Materias: cod_carrera,
+Matriculas:nro_alumno,cod_carrera
+Examenes:nro_alumno,cod_carrera,cod_materia
+
+2.
+a)Mostrar nro_alumno, nom_alumno, cod_carrera, nom_carrera y promedio de los alumnos que ingresaron en 1995 y tienen promedio >= 7 y han rendido más de 20 exámenes finales (no considerar los ausentes)
+
+((((Matricula WHERE(ano_ingreso=1995)) JOIN (Examenes GROUPBY (nro_alumno,cod_carrera) ADD AVG(nota_examen) AS Promedio, ADD COUNT(nota_examen) as rendidos)) WHERE promedio>=7 AND rendidos>20) JOIN Carreras) Join Alumnos [nro_alumno,nom_alumno,cod_carrera,nom_carrera,promedio]
+
+b)Cantidad de materias aprobadas por el alumno 'SANCHEZ' en la carrera 'CONTADOR PUBLICO'
+

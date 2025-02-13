@@ -1,0 +1,14 @@
+ERwin 4.0 Service Pack 1
+
+When you finish installing ERwin 4.0,
+go to the to START MENU - PROGRAMS - CA REGISTRATION,
+click on RegisterIT. 
+In the RegisterIT Welcome pane, click the Next button. 
+Click Register Later and then click the Next button. 
+Complete the following fields: 
+Product Name Choose ERwin 4.0 from the list. 
+Registration ID Type: 1160230364470518 
+Click Next and then click Finish. 
+
+Eso es todo.
+

@@ -1,0 +1,121 @@
+' SISTEMAS DE BASES DE DATOS – INGENIERÍA INFORMÁTICA 
+ 
+' DISEÑO DE BASES DE DATOS RELACIONALES 
+ 
+ 
+' Ejercicio N° 18: Construir el modelo de datos lógico y el modelo físico para el siguiente 
+' problema: 
+ 
+' Se requiere diseñar un modelo de bases de datos relacionales para satisfacer los 
+' requerimientos de información acerca de los presupuestos de diferentes áreas de una 
+' empresa. 
+ 
+' La información que se deberá registrar será la siguiente: 
+ 
+' − Áreas de la empresa: identificadas con un número. Se deberá registrar su nombre. 
+ 
+' − Empleados: Identificados por un nro. de legajo. Registrar además, nombre, 
+' documento y dirección 
+ 
+' − Plan de cuentas: Se registrará información acerca de las cuentas que se utilizarán en 
+' los presupuestos (similar a un sistema contable). Las cuentas se identifican por un 
+' código, se registrará además su nombre, si es de ingreso o de egreso y el área que la 
+' utilizará. 
+ 
+' − Presupuestos: Los presupuestos serán anuales y se requerirá información acerca del 
+' año al que corresponde, área y responsable del mismo. También se registrará la lista 
+' de empleados que pueden autorizar gastos sobre dicho presupuesto. 
+ 
+' − Detalle de presupuestos: Presupuesto, cuenta, total presupuestado 
+ 
+' − Ejecución de presupuestos: Se registrarán todos los movimientos (ingresos o 
+' egresos) para cada cuenta de cada presupuesto. Se requiere: presupuesto, área, 
+' cuenta, fecha, importe, comprobante, nro. movimento (único por comprobante). 
+ 
+'  Regla 1: No se pueden registrar gastos que superen el presupuesto asignado
+'  Descripción: Antes de insertar un gasto en la tabla Ejecucion_Presupuestos, se debe verificar que el importe total gastado en esa cuenta no supere el total presupuestado en Detalle_Presupuestos.
+
+' Trigger:
+
+' Se ejecuta antes de insertar o actualizar un gasto.
+' Si el nuevo gasto supera el límite, se cancela la operación.
+' Regla 2: Si se elimina un presupuesto, sus detalles y ejecución deben eliminarse también
+'  Descripción: Si un presupuesto es eliminado de la tabla Presupuestos, se deben eliminar automáticamente los registros en Detalle_Presupuestos y Ejecucion_Presupuestos asociados a él.
+
+' Trigger:
+
+' Se ejecuta después de eliminar un presupuesto.
+' Borra los detalles y la ejecución del presupuesto eliminado.
+
+
+
+@startuml
+
+class Area {
+    nro_area: int
+    --
+    nom_area: varchar
+}
+
+class Empleado {
+    nro_legajo: int
+    --
+    nom_empleado: varchar
+    documento: varchar
+    direccion: varchar
+}
+
+class PlanCuentas {
+    cod_cuenta: int
+    --
+    nom_cuenta: varchar
+    tipo_cuenta: char
+    area: int
+}
+
+
+class Presupuesto {
+    anio_presupuesto: int
+    --
+    area: int
+    responsable: int
+}
+
+class EmpleadoAutorizante {
+    nro_legajo: int
+    anio_presupuesto: int
+}
+
+class DetallePresupuesto {
+    anio_presupuesto: int
+    cod_cuenta: int
+    --
+    total_presupuestado: int
+}
+
+
+class EjecucionPresupuesto {
+    anio_presupuesto: int
+    nro_movimiento: int
+
+    --
+    area: int
+    cod_cuenta: int
+    fecha: date
+    importe: int
+}
+
+class Comprobante {
+    nro_movimiento: int
+    --
+    comprobante: varchar
+}
+
+'relationships
+
+Presupuesto "1"--{ EjecucionPresupuesto
+EjecucionPresupuesto "1"--{ Comprobante
+Presupuesto "1"--{ DetallePresupuesto
+
+
+@enduml

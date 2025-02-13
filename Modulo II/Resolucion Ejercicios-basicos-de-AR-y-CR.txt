@@ -1,0 +1,96 @@
+Ejercicios-basicos-de-AR-y-CR.pdf  ☺ correcto ☻ incorrecto
+1) (nom_emp,nro_depto)
+emp[nom_emp,nro_depto] ☺
+
+2. (todos los datos) de los empleados con salario entre 1500 y 2000
+emp where (sueldo>=1500 and sueldo<=2000) ☺
+profe: emp where sueldo between 1500 and 2000
+
+3. (nro_emp, nom_emp, salario) de los empleados con cargo 'VENDEDOR' o 
+'ADMINISTRATIVO'
+(emp where (cargo=='VENDEDOR' or cargo=='ADMINISTRATIVO')) [nro_emp,nom_emp,sueldo] ☺
+profe: emp where cargo in ('VENDEDOR','ADMINISTRATIVO') [nro_emp,nom_emp,sueldo]
+
+4. (nom_emp, nom_depto) de todos los empleados
+(emp JOIN deptos) [nom_emp,nom_depto] ☺
+
+5. (nom_emp) de los empleados del departamento 'CONTABILIDAD'
+((emp JOIN deptos) where (nom_depto=='Contabilidad')) [nom_emp] ☺
+tambien valido: (emp JOIN (deptos where nom_depto='Contabilidad')) [nom_emp]
+
+6. (nom_depto) de los departamentos que tengan empleados
+(emp JOIN deptos) [nom_depto] ☺
+
+7. (nom_depto) de los departamentos que tengan empleados con cargo 'VENDEDOR'
+((emp JOIN deptos) where (cargo=='VENDEDOR')) [nom_depto] ☺
+
+8. (nom_depto) de los departamentos que NO tengan empleados con cargo 
+'VENDEDOR'
+((emp JOIN deptos) where (cargo!='VENDEDOR')) [nom_depto] ☻
+
+(deptos[nom_depto]) MENOS (((emp JOIN deptos) where (cargo=='VENDEDOR')) [nom_depto])
+
+9. (nro_emp) de los empleados que trabajan en el mismo departamento que el 
+empleado 'GIMENEZ'
+emp where (nro_depto==20) [nom_emp] -> forma incorrecta pq no se tiene en cuenta que gimenez cambie de depto ☻
+
+((emp JOIN (emp where nom_emp=="Gimenez")[nro_depto])) where nom_emp!="Gimenez") [nro_emp] ☺
+
+profe: ((emp X (emp where nom_emp=="Gimenez")[nro_depto AS nro_depto_GI]) where (nom_emp!='Gimenez') and (nro_depto==nro_depto_gi)) [nor_emp]
+
+10. (nro_emp) de los empleados más antiguos que el “GERENTE”
+((emp X ((emp where cargo=='Gerente')[fecha_ing AS fecha_ing_ger])) where fecha_ing < fecha_ing_ger) [nro_emp] ☺
+se debe usar producto cartesiano ya que el JOIN requiere de un campo en comun, en este caso al tener el nuevo campo creado se debe aplicar a todas las filas
+
+11. (nom_depto) de los departamentos que tienen empleados en todos los cargos
+
+12. (nro_emp, nom_emp, salario_anual) de los empleados con cargo 'VENDEDOR'. 
+(salario_anual = salario*12)
+(emp where cargo=='VENDEDOR') [nro_emp,nom_emp,sueldo*12 AS salario_anual]
+
+13. Cantidad de empleados por departamento (nom_depto, cantidad)
+(depto LEFT JOIN emp) GROUP BY (nom_depto) ADD COUNT(nro_emp) AS cantidad 
+LEFT JOIN en este caso me dejare la tabla empleadoDepto pero con una tupla nueva que va a ser el nro_depto 40 que seria ignorado en un JOIN comun
+En el caso deun RIGHT JOIN seria lo mismo que hacer un JOIN comun (solo en este caso)
+No es necesario hacer una proyeccion al final ya que salen de forma automatica
+GROUP BY devuelve una tabla con los valores del GROUP BY (en este caso una tabla de nom_depto)
+
+14. Máximo, mínimo y promedio de salarios por departamento (nom_depto, máximo, 
+mínimo, promedio)
+((emp RIGHT JOIN depto) GROUP BY (nom_depto) ADD MAX(sueldo) AS maximo, MIN(sueldo) AS minimo, SUM(sueldo)/(COUNT(sueldo)) AS promedio) ☺
+No es necesario hacer una proyeccion al final ya que salen de forma automatica
+
+Profe:
+(emp GROUP BY(nro_depto) ADD MAX(sueldo) as maximo, MIN(sueldo) as minimo, AVG(sueldo) as promedio) JOIN deptos [nom_depto,maximo,minimo,promedio]
+(emp JOIN deptos) GROUP BY(nom_depto) ADD MAX(sueldo) as maximo, MIN(sueldo) as minimo, AVG(sueldo) as promedio
+
+15. Máximo, mínimo y promedio de salarios (máximo, mínimo, promedio)
+emp ADD MAX(sueldo) AS maximo, MIN(sueldo) AS minimo, AVG(sueldo) as promedio ☺
+
+Profe:
+emp GROUP BY() ADD MAX(sueldo) AS maximo, MIN(sueldo) AS minimo, AVG(sueldo) as promedio
+
+16. (nom_depto) de los departamentos que tengan más de 3 empleados
+((emp JOIN deptos) GROUP BY(nom_depto) ADD COUNT(nro_emp) cantidad) WHERE (cantidad>3)) [nom_depto] ☺
+
+Profe:
+((emp JOIN deptos) GROUP BY(nom_depto) ADD COUNT(nro_emp) cantidad)
+
+17. (nro_emp,nro_depto) de los empleados con menor salario en cada departamento
+(emp JOIN (emp GROUP BY(nro_depto) MIN(sueldo) AS sueldo)) [nro_emp,nro_depto] ☺
+
+Al usar sueldo (que es el mismo nombre que esta en la tabla) el join lo va a emparejar por el sueldo minimo dejando solo los empleados con el sueldo minimo para mostrar
+
+Profe:
+(((emp GROUP BY(nro_depto) ADD MIN(sueldo) minimo) JOIN emp) WHERE(sueldo==mininmo)) [nro_emp,nro_depto] 
+
+18. (nro_emp,nro_depto) de los empleados con salario mayor al promedio del 
+departamento
+((emp JOIN (emp GROUP BY(nro_depto) ADD AVG(sueldo) AS promedio)) WHERE (sueldo>promedio)) [nro_emp,nro_depto]
+
+19. (nro_emp) de los empleados con menor salario que el mayor salario del 
+departamento nro. 30
+(emp x (emp GROUP BY (nro_depto) MAX(sueldo) AS maximo30 WHERE(nro_depto==30))) WHERE(sueldo<maximo30) [nro_emp]
+
+Profe:
+((emp X ((emp WHERE(nro_depto=30)) GROUP BY() ADD MAX(sueldo) AS maximo30)) WHERE(sueldo<maximo30)) [neo_emp]

@@ -1,0 +1,13 @@
+Installation
+
+: 1. Locate Product.dat in the directory C:\Ca_lic
+: 2. Copy Keygen.exe into the above directory
+: 3. Run Keygen.exe, select PRODUCT NAME as ERWIN 4.0 in the dropdown box
+: 4. Click GENERATE ID: This will produce a 16 digit key specific to your machine (in my case the number was 7725078270158297)
+: 5. Goto START -> PROGRAMS -> CA REGISTRATION -> REGISTERIT" 
+: 6. "Click NEXT
+: 7. Select "Register Later" and click NEXT
+: 8. Select Product Name: ERwin 4.0, and paste your Registration ID from the keygen, and click NEXT. Make sure to watch the messages.
+: 9. Click NEXT again, and then click FINISH
+: 10. You are ready to go!
+

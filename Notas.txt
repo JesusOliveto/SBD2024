@@ -1,0 +1,9 @@
+Esta permitido utilizar copilotos para el desarrollo de la meteria tanto en materia como en examens
+
+Evaluaciones: No hay promocion
+analisis y diseño (grupal)
+programacion
+programacion compleja
+Todas las evaluacion son los jueves
+
+Final: nos da un caso, lo diseñamos implementamos y hacemos programacion sobre este
