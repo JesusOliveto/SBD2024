@@ -49,6 +49,11 @@
 
 
 
+
+
+
+
+
 @startuml
 
 class Area {
@@ -65,30 +70,27 @@ class Empleado {
     direccion: varchar
 }
 
-class PlanCuentas {
-    cod_cuenta: int
-    --
-    nom_cuenta: varchar
-    tipo_cuenta: char
-    area: int
-}
-
 
 class Presupuesto {
     anio_presupuesto: int
+    nro_area: int
     --
-    area: int
     responsable: int
 }
+
 
 class EmpleadoAutorizante {
     nro_legajo: int
     anio_presupuesto: int
+    nro_area: int
 }
+
+
 
 class DetallePresupuesto {
     anio_presupuesto: int
-    cod_cuenta: int
+    nro_area: int
+    nro_cuenta: int
     --
     total_presupuestado: int
 }
@@ -96,14 +98,24 @@ class DetallePresupuesto {
 
 class EjecucionPresupuesto {
     anio_presupuesto: int
+    nro_area: int
     nro_movimiento: int
-
     --
-    area: int
-    cod_cuenta: int
+    nro_cuenta: int
     fecha: date
     importe: int
 }
+
+class PlanCuentas {
+    cod_cuenta: int
+    --
+    nom_cuenta: varchar
+    tipo_cuenta: char
+    anio_presupuesto: int
+    nro_area: int
+    nro_movimiento: int
+}
+
 
 class Comprobante {
     nro_movimiento: int
@@ -113,9 +125,15 @@ class Comprobante {
 
 'relationships
 
-Presupuesto "1"--{ EjecucionPresupuesto
-EjecucionPresupuesto "1"--{ Comprobante
-Presupuesto "1"--{ DetallePresupuesto
+ Presupuesto "1"--{ EjecucionPresupuesto
+ EjecucionPresupuesto }--"1" Comprobante
+ Presupuesto "1"--{ DetallePresupuesto
+ Presupuesto "1"--{ EmpleadoAutorizante
+ Empleado "1"--{ EmpleadoAutorizante
+ Area "1"--{ Presupuesto
+ EjecucionPresupuesto "1"..{ PlanCuentas
+ Empleado "1" ..{Presupuesto
 
 
-@enduml
+
+ @enduml

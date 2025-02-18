@@ -150,6 +150,9 @@ Tarea_Etapa }-- "1" Etapa
 
 Cargo "1"..{ Profesional
 Titulo "1"..{ Profesional
- 
+
+
+
+
 @enduml
 

@@ -1,0 +1,255 @@
+' Un banco necesita gestionar créditos para la construcción de viviendas para lo cual requiere la implementación de una base de datos relacional. 
+' El proceso a modelar es el siguiente:
+' 1) Una persona solicita un crédito para la construcción de una vivienda. Para ello debe presentar un proyecto de obra y un presupuesto.
+' 2) El banco evalúa el proyecto y el presupuesto y decide si aprueba o rechaza el crédito.
+' 3) Si el crédito es aprobado, el banco lo otorga en tramos de acuerdo a certificaciones de avance de obra. Cada certificación aprueba o no el avance requerido. Si se aprueba, entonces se libera el nuevo tramo del crédito, sino no.
+' 4) El banco le crea una cuenta bancaria al cliente donde se le acreditará cada tramo del crédito y donde el banco hará los débitos correspondientes a las cuotas del crédito.
+' 5) Apenas el crédito se aprueba y la cuenta es creada, el banco acredita el primer tramo del crédito en la cuenta del cliente.
+
+' Teniendo en cuenta el proceso descripto, se pide:
+' a) Registrar los siguientes datos de personas (Clientes ó garantes): 
+' -Identificador interno numérico autogenerado
+' -apellido
+' -nombre
+' -tipo de documento de identidad
+' -número de documento de identidad
+' -domicilio
+' -teléfonos
+' -Email.
+
+' b) Registrar la solicitud del crédito solicitado: 
+' -identificador interno numérico del crédito
+' -cliente que solicita
+' -monto solicitado
+' -fecha de solicitud
+' -garantes propuestos 
+' -proyecto de obra
+' -Estado (A: Aprobado, B: Rechazado)
+' -Fecha de resolución (de aprobación o rechazo) . 
+
+' c) En el caso de aprobación registrar un Crédito con los siguientes datos:
+' -Monto aprobado
+' -Gastos y comisiones (se necesita un detalle de cada gasto y comisión con el concepto y el importe correspondiente)
+' -Monto neto del crédito (corresponde al monto aprobado menos el total de gastos y comisiones)
+' -Lista de cuotas con su fecha de vencimiento, importe neto, intereses e importe total 
+' -Tramos del crédito (en cuantos tramos se entregará la suma aprobada neta) 
+
+' d) Para las certificaciones de avance de obra se debe registrar:
+' - Fecha y el resultado (avance aprobado o rechazado) y una observación.  
+
+' e) En la misma cuenta donde se acreditan los tramos del crédito se debitarán las cuotas correspondientes. Este débito se hará por el monto completo de la cuota. Es decir, no hay pagos parciales de cuotas. Se debe informar el tipo de movimiento, la fecha y el importe. 
+
+' Se solicita implementar la base de datos con todas las reglas de integridad declarativas en SQL Server
+
+
+@startuml
+class Persona {
+    ID_Persona: int
+    --
+    Apellido: varchar
+    Nombre: varchar
+    Tipo_Documento: varchar
+    Numero_Documento: varchar
+    Domicilio: varchar
+    Telefono: varchar
+    Email: varchar
+}
+
+class Solicitud_Credito {
+    ID_Credito: int
+    --
+    ID_Cliente: int
+    Monto_Solicitado: float
+    Fecha_Solicitud: date
+    Proyecto_Obra: text
+    Estado: char(1)
+    Fecha_Resolucion: date
+}
+
+class Garante_Credito {
+    ID_Credito: int
+    ID_Garante: int
+}
+
+class Credito {
+    ID_Credito: int
+    --
+    Monto_Aprobado: float
+    Monto_Neto: float
+    ID_Cuenta: int
+}
+
+class Gasto {
+    ID_Gasto: int
+    ID_Credito: int
+    --
+    Concepto: varchar
+    Importe: float
+}
+
+class Comision {
+    ID_Comision: int
+    ID_Credito: int
+    --
+    Concepto: varchar
+    Importe: float
+}
+
+class Cuota {
+    ID_Cuota: int
+    ID_Credito: int
+    --
+    Fecha_Vencimiento: date
+    Importe_Neto: float
+    Intereses: float
+    Importe_Total: float
+}
+
+class Tramo {
+    ID_Tramo: int
+    ID_Credito: int
+    --
+    Numero_Tramo: int
+    Monto_Tramo: float
+    ID_Certificacion: int
+}
+
+class Certificacion {
+    ID_Certificacion: int
+    ID_Credito: int
+    --
+    Fecha: date
+    Resultado: char(1)
+    Observacion: text
+}
+
+class Cuenta_Bancaria {
+    ID_Cuenta: int
+    --
+    ID_Cliente: int
+    Saldo: float
+}
+
+class Movimiento {
+    ID_Movimiento: int
+    --
+    ID_Cuenta: int
+    Tipo_Movimiento: varchar
+    Fecha: date
+    Importe: float
+}
+
+
+Persona "1"--{ Solicitud_Credito
+Persona "1"--{ Garante_Credito
+Solicitud_Credito "1"--{ Garante_Credito
+Solicitud_Credito "1"--{ Credito
+Credito "1"--{ Gasto
+Credito "1"--{ Comision
+Credito "1"--{ Cuota
+Credito "1"--{ Tramo
+Credito "1"--{ Cuenta_Bancaria
+Tramo "1"--{ Certificacion
+Cuenta_Bancaria "1"--{ Movimiento
+
+
+
+
+
+' Persona "1" -- "0..*" Solicitud_Credito : Cliente
+' Persona "1" -- "0..*" Garante_Credito : Garante
+
+' Solicitud_Credito "1" -- "0..*" Garante_Credito
+
+' Solicitud_Credito "1" -- "0..1" Credito : Aprobado
+' Credito "1" -- "0..*" Gasto_Comision
+' Credito "1" -- "0..*" Cuota
+' Credito "1" -- "0..*" Tramo
+' Credito "1" -- "1" Cuenta_Bancaria
+
+' Tramo "1" -- "1" Certificacion
+' Certificacion "1" -- "1" Credito
+
+' Cuenta_Bancaria "1" -- "0..*" Movimiento
+
+@enduml
+
+
+' @startuml
+
+' class Persona {
+'     id_persona: int
+'     --
+'     apellido: varchar
+'     nombre: varchar
+'     tipo_doc: varchar
+'     nro_doc: int
+'     domicilio: varchar
+'     telefono: varchar
+'     email: varchar
+' }
+
+' class SolicitudCredito {
+'     id_solicitud_credito: int
+'     id_persona: int
+'     monto_solicitado: int
+'     fecha_solicitud: date
+'     garantes: lista de int
+'     proyecto_obra: varchar
+'     estado: char
+'     fecha_resolucion: date
+' }
+
+
+' class Credito {
+'     id_credito: int
+'     id_solicitud_credito: int
+'     monto_aprobado: int
+'     gastos: lista 
+'     comisiones : lista
+'     monto_neto: int
+'     cuotas: lista de int
+'     tramos: int
+' }
+
+' class Gasto {
+'     id_gasto: int
+'     concepto: varchar
+'     importe: int
+' }
+
+' class Comision {
+'     id_comision: int
+'     concepto: varchar
+'     importe: int
+' }
+
+' class Cuota {
+'     id_cuota: int
+'     fecha_vencimiento: date
+'     importe_neto: int
+'     intereses: int
+'     importe_total: int
+' }
+
+' class Certificacion {
+'     id_certificacion: int
+'     fecha: date
+'     resultado: char
+'     observacion: varchar
+' }
+
+' class Movimiento {
+'     id_movimiento: int
+'     tipo: varchar
+'     fecha: date
+'     importe: int
+' }
+
+
+' persona | -- |{ solicitudCredito
+' solicitudCredito | -- |{ credito
+
+
+
+' @enduml
