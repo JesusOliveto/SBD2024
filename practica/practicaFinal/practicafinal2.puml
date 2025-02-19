@@ -1,0 +1,149 @@
+' INGENIERIA INFORMÁTICA – SISTEMAS DE BASES DE DATOS – EXAMEN FINAL 05-02-2025 – TEMA 1 
+
+' Se necesita diseñar e implementar una base de datos que permita gestionar un sistema de reservas de espacios en un coworking. 
+
+' Se requerirá información sobre: 
+
+' Espacios de trabajo: Se identifican con un código único y se registra su nombre, capacidad máxima y tipo de espacio de trabajo (Oficina privada, Sala de trabajo compartido, Sala de reuniones, etc.).  
+
+' Clientes: Se identifican con un número único e incluyen nombre, apellido, número de documento, teléfono y correo electrónico. 
+
+' Reservas: Se identifican con un número único, fecha y hora de inicio, fecha y hora de finalización, el espacio reservado y el cliente que realizó la reserva. Cada reserva tiene un estado: Pendiente, Confirmada, Cancelada, Utilizada. 
+
+' Planes de suscripción: Algunos clientes pueden suscribirse a planes de uso del coworking. Estos planes se registran con un código único, nombre del plan, tipo de espacio de trabajo, cantidad de horas disponibles por mes y costo mensual. 
+
+' Uso de horas de suscripción: Para los clientes con planes de suscripción, se debe llevar un registro del uso de horas, indicando la suscripción asociada y la cantidad de horas descontadas del plan. 
+
+' Pagos: Se registran los pagos realizados por los clientes de las reservas y planes contratados, identificándolo con un código único, el monto abonado, la fecha de pago, el método de pago (Tarjeta de crédito, Transferencia bancaria, etc.) y las reservas y/o planes que paga. Un pago puede pagar una o varias reservas y/o planes de suscripción. Cada reserva o plan de suscripción se debe pagar de una sola vez de manera completa. 
+
+' Se solicita:  
+
+' Diseñar un modelo lógico de datos para el problema (30) 
+
+' Implementar la base de datos (10) 
+
+' Controlar que un cliente con un plan de suscripción no reserve más horas que las disponibles en su plan (35) 
+
+' Programar un procedimiento almacenado que reciba un rango de fechas (fecha_desde y fecha_hasta) y muestre: 
+
+' Cantidad de reservas realizadas por cada tipo de espacio 
+
+' Total de horas reservadas por cada tipo de espacio 
+
+' Cantidad de clientes únicos que reservaron cada tipo de espacio 
+
+' Tasa de ocupación de cada tipo de espacio en relación a su disponibilidad máxima suponiendo que el coworking está abierto 24 horas por día, todos los días 
+
+ 
+
+' Mostrar lo siguiente: (25) 
+
+ 
+
+' TIPO DE ESPACIO	Cant. Reservas		Total horas	Cant. Clientes		Tasa ocupación 
+
+' Oficina privada		1023			4256		251			84.23% 
+
+' Sala de reuniones		423			1763		42			62.07% 
+
+' Sala de trabajo comp.		324			561		65			51.87% 
+
+' --------------------------------------------------------------------------------------------------
+
+
+ @startuml
+
+
+class TipoEspacio {
+    id_tipo_espacio: int
+    --
+    nombre: varchar
+}
+
+class EspaciosTrabajo {
+    id_espacio: int
+    --
+    nombre: varchar
+    capacidad_maxima: int
+    id_tipo_espacio: int
+}
+
+class Clientes {
+    id_cliente: int
+    --
+    nombre: varchar
+    apellido: varchar
+    numero_documento: int unico
+    telefono: varchar
+    email: varchar
+}
+
+class Reservas {
+    id_reserva: int
+    --
+    fecha_inicio: datetime
+    fecha_fin: datetime
+    id_espacio: int
+    id_cliente: int
+    estado: varchar (check)
+}
+
+class PlanesSuscripcion {
+    id_plan: int
+    --
+    nombre_plan: varchar
+    id_tipo_espacio: int
+    horas_mensuales: int
+    costo_mensual: float
+}
+
+
+
+class UsoHorasSuscripcion {
+    id_cliente: int
+    id_plan: int
+    --
+    horas_utilizadas: int
+}
+
+Class MetodoPago {
+    id_metodo_pago: int
+    --
+    nombre: varchar
+}
+
+class Pagos {
+    id_pago: int
+    --
+    id_cliente: int
+    fecha_pago: datetime
+    id_metodo_pago: int
+    monto: float
+}
+
+class PagosReservas {
+    id_pago: int
+    id_reserva: int
+}
+
+class PagosPlanes {
+    id_pago: int
+    id_plan: int
+}
+
+Clientes "1" ..{ Reservas
+EspaciosTrabajo "1" ..{ Reservas
+Clientes "1" ..{ PlanesSuscripcion
+Clientes "1" --{ UsoHorasSuscripcion
+PlanesSuscripcion "1" --{ UsoHorasSuscripcion
+Clientes "1" ..{ Pagos
+Reservas "1" --{ PagosReservas
+PlanesSuscripcion "1" --{ PagosPlanes
+Pagos "1" --{ PagosReservas
+Pagos "1" --{ PagosPlanes
+TipoEspacio "1" ..{ EspaciosTrabajo
+TipoEspacio "1" ..{ PlanesSuscripcion
+MetodoPago "1" ..{ Pagos
+
+
+ @enduml

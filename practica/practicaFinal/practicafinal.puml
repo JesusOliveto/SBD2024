@@ -56,9 +56,9 @@ class Persona {
 }
 
 class Solicitud_Credito {
-    ID_Credito: int
+    ID_solicitud_credito: int
     --
-    ID_Cliente: int
+    ID_Persona: int
     Monto_Solicitado: float
     Fecha_Solicitud: date
     Proyecto_Obra: text
@@ -67,13 +67,14 @@ class Solicitud_Credito {
 }
 
 class Garante_Credito {
-    ID_Credito: int
-    ID_Garante: int
+    ID_solicitud_credito: int
+    ID_Persona: int
 }
 
 class Credito {
     ID_Credito: int
     --
+    ID_solicitud_credito: int
     Monto_Aprobado: float
     Monto_Neto: float
     ID_Cuenta: int
@@ -103,6 +104,7 @@ class Cuota {
     Importe_Neto: float
     Intereses: float
     Importe_Total: float
+    ID_Cuenta: int
 }
 
 class Tramo {
@@ -116,8 +118,9 @@ class Tramo {
 
 class Certificacion {
     ID_Certificacion: int
-    ID_Credito: int
     --
+    ID_Tramo: int
+    ID_Credito: int
     Fecha: date
     Resultado: char(1)
     Observacion: text
@@ -126,12 +129,12 @@ class Certificacion {
 class Cuenta_Bancaria {
     ID_Cuenta: int
     --
-    ID_Cliente: int
-    Saldo: float
+    ID_Persona: int
 }
 
 class Movimiento {
     ID_Movimiento: int
+    ID_Credito: int
     --
     ID_Cuenta: int
     Tipo_Movimiento: varchar
@@ -140,116 +143,21 @@ class Movimiento {
 }
 
 
-Persona "1"--{ Solicitud_Credito
+Persona "1"..{ Solicitud_Credito
 Persona "1"--{ Garante_Credito
 Solicitud_Credito "1"--{ Garante_Credito
-Solicitud_Credito "1"--{ Credito
+Solicitud_Credito "1"..{ Credito
 Credito "1"--{ Gasto
 Credito "1"--{ Comision
 Credito "1"--{ Cuota
 Credito "1"--{ Tramo
-Credito "1"--{ Cuenta_Bancaria
-Tramo "1"--{ Certificacion
-Cuenta_Bancaria "1"--{ Movimiento
+Credito "1"--{ Movimiento
+Tramo "1"..{ Certificacion
+Cuenta_Bancaria "1"..{ Movimiento
+Cuenta_Bancaria "1"..{ Cuota
+Persona "1"..{ Cuenta_Bancaria
 
 
-
-
-
-' Persona "1" -- "0..*" Solicitud_Credito : Cliente
-' Persona "1" -- "0..*" Garante_Credito : Garante
-
-' Solicitud_Credito "1" -- "0..*" Garante_Credito
-
-' Solicitud_Credito "1" -- "0..1" Credito : Aprobado
-' Credito "1" -- "0..*" Gasto_Comision
-' Credito "1" -- "0..*" Cuota
-' Credito "1" -- "0..*" Tramo
-' Credito "1" -- "1" Cuenta_Bancaria
-
-' Tramo "1" -- "1" Certificacion
-' Certificacion "1" -- "1" Credito
-
-' Cuenta_Bancaria "1" -- "0..*" Movimiento
 
 @enduml
 
-
-' @startuml
-
-' class Persona {
-'     id_persona: int
-'     --
-'     apellido: varchar
-'     nombre: varchar
-'     tipo_doc: varchar
-'     nro_doc: int
-'     domicilio: varchar
-'     telefono: varchar
-'     email: varchar
-' }
-
-' class SolicitudCredito {
-'     id_solicitud_credito: int
-'     id_persona: int
-'     monto_solicitado: int
-'     fecha_solicitud: date
-'     garantes: lista de int
-'     proyecto_obra: varchar
-'     estado: char
-'     fecha_resolucion: date
-' }
-
-
-' class Credito {
-'     id_credito: int
-'     id_solicitud_credito: int
-'     monto_aprobado: int
-'     gastos: lista 
-'     comisiones : lista
-'     monto_neto: int
-'     cuotas: lista de int
-'     tramos: int
-' }
-
-' class Gasto {
-'     id_gasto: int
-'     concepto: varchar
-'     importe: int
-' }
-
-' class Comision {
-'     id_comision: int
-'     concepto: varchar
-'     importe: int
-' }
-
-' class Cuota {
-'     id_cuota: int
-'     fecha_vencimiento: date
-'     importe_neto: int
-'     intereses: int
-'     importe_total: int
-' }
-
-' class Certificacion {
-'     id_certificacion: int
-'     fecha: date
-'     resultado: char
-'     observacion: varchar
-' }
-
-' class Movimiento {
-'     id_movimiento: int
-'     tipo: varchar
-'     fecha: date
-'     importe: int
-' }
-
-
-' persona | -- |{ solicitudCredito
-' solicitudCredito | -- |{ credito
-
-
-
-' @enduml
